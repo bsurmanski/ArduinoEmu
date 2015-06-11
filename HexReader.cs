@@ -7,6 +7,7 @@ using System;
  */ 
 public class HexReader : IReader {
 	StreamReader stream;
+    int length;
 	int offset;
 	HexRecord currentRecord;
 
@@ -32,7 +33,7 @@ public class HexReader : IReader {
 
 		int offset;
 
-		int hexToInt(char c) {
+		static int hexToInt(char c) {
 			if (c >= '0' && c <= '9') {
 				return c - '0';
 			} else if (c >= 'a' && c <= 'f') {
@@ -41,8 +42,18 @@ public class HexReader : IReader {
 				return c - 'A' + 10;
 			}
 
-			throw new ArgumentException ("Character must be hex character");
+			throw new ArgumentException ("Character must be hex character: " + c);
 		}
+
+        public static int RecordSize(string str) {
+            if (!str.StartsWith(":"))
+            {
+                //throw new InvalidDataException("file does not conform to HEX format");
+                throw new ArgumentException("file does not conform to HEX format");
+            }
+
+            return (hexToInt(str[1]) << 4) + hexToInt(str[2]);
+        }
 
 		public HexRecord(string str) {
 			if(!str.StartsWith(":")) {
@@ -101,10 +112,26 @@ public class HexReader : IReader {
 		}
 	}
 
-	public HexReader(FileStream f) {
+	public HexReader(Stream f) {
+        length = -1;
 		stream = new StreamReader(f);
 		currentRecord = new HexRecord(stream.ReadLine());
 	}
+
+   public  long Length() {
+        if (length < 0)
+        {
+            length = 0;
+            long set = stream.BaseStream.Position;
+            stream.BaseStream.Seek(0, SeekOrigin.Begin);
+            while (!stream.EndOfStream)
+            {
+                length += HexRecord.RecordSize(stream.ReadLine());
+            }
+            stream.BaseStream.Seek(set, SeekOrigin.Begin);
+        }
+        return length;
+    }
 
 	public byte getbyte() {
 		if (currentRecord.eof ()) {
