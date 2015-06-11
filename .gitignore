@@ -1,0 +1,7 @@
+obj
+*.swp
+*.csproj
+*.user
+*.suo
+bin
+Properties
