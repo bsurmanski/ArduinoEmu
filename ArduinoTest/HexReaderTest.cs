@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.IO;
+using Arduino;
 
 namespace ArduinoTest
 {
@@ -17,7 +18,7 @@ namespace ArduinoTest
         }
 
         [TestMethod]
-        public void Decode()
+        public void ReadHexFile()
         {
            
             HexReader hex = new HexReader(new MemoryStream(hexcoded));
