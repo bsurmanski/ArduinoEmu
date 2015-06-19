@@ -7,7 +7,7 @@ namespace Arduino
     /**
      * Reads .hex file formats. 'getchar' will read subsequent characters from the file
      */
-    public class HexReader : Stream
+    public class HEXReader : Stream
     {
         StreamReader stream;
         int length;
@@ -19,7 +19,7 @@ namespace Arduino
          */
         class HexRecord
         {
-            const bool LENDIAN = true;
+            const bool LENDIAN = false;
             enum RecordType
             {
                 DATA = 0,
@@ -116,7 +116,7 @@ namespace Arduino
             }
         }
 
-        public HexReader(Stream f) {
+        public HEXReader(Stream f) {
             length = -1;
             stream = new StreamReader(f);
             currentRecord = new HexRecord(stream.ReadLine());
@@ -212,9 +212,11 @@ namespace Arduino
                 if (stream.EndOfStream) {
                     return -1;
                 }
+
                 currentRecord = new HexRecord(stream.ReadLine());
             }
 
+            offset++;
             return (int)currentRecord.GetByte();
         }
 
